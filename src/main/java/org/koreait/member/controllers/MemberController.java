@@ -18,7 +18,7 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/member")
-@SessionAttributes("RequestLogin")
+@SessionAttributes("requestLogin")
 public class MemberController {
 
     private final Utils utils;
@@ -31,7 +31,7 @@ public class MemberController {
         return List.of("member/style");
     }
 
-    @ModelAttribute("RequestLogin")
+    @ModelAttribute("requestLogin")
     public RequestLogin requestLogin(){
         return new RequestLogin();
     }

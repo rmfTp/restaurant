@@ -19,12 +19,11 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
      */
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         HttpSession session = request.getSession();
-        RequestLogin form = (RequestLogin) session.getAttribute("RequestLogin");
+        RequestLogin form = (RequestLogin) session.getAttribute("requestLogin");
         form = Objects.requireNonNullElseGet(form, RequestLogin::new);
 
         String redirectUrl = form.getRedirectUrl();
         String url = StringUtils.hasText(redirectUrl) ? redirectUrl : "/";
-        System.out.println("url:" + url);
         session.removeAttribute("requestLogin");
 
         response.sendRedirect(request.getContextPath() + url);
