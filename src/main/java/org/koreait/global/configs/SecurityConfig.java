@@ -53,7 +53,7 @@ public class SecurityConfig {
 
         http.exceptionHandling(c -> {
             c.authenticationEntryPoint(new MemberAuthenticationExceptionHandler());
-            c.accessDeniedHandler(new LoginAccessDeniedHandler());
+            c.accessDeniedHandler(new MemberAccessDeniedHandler());
         });
 
         return http.build();
