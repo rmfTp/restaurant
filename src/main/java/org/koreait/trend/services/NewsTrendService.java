@@ -81,7 +81,7 @@ public class NewsTrendService {
             String keywords = om.writeValueAsString(item.getKeywords());
             Trend data = new Trend();
             data.setCategory("NEWS");
-            data.setCategory(wordCloud);
+            data.setWordCloud(wordCloud);
             data.setKeywords(keywords);
             repository.save(data);
         }catch (JsonProcessingException e){}
