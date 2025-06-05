@@ -38,3 +38,8 @@ file:
   upload:
     url: ${file.url}
     path: ${file.path}
+
+python:
+  path:
+    base: ${python.base}
+    trend: ${python.trend}

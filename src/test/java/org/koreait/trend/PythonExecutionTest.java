@@ -15,7 +15,7 @@ public class PythonExecutionTest {
         int statusCode = process.waitFor();
         if (statusCode!=0) return;
 
-        builder = new ProcessBuilder("C:/trend/.venv/Scripts/python.exe", "C:/ternd/trend.py", "C:uploads/trend/");
+        builder = new ProcessBuilder("C:/trend/.venv/Scripts/python.exe", "C:/trend/trend.py", "C:/uploads/trend/");
         process = builder.start();
         statusCode = process.waitFor();
         System.out.println("statusCode:"+statusCode);
