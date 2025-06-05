@@ -1,10 +1,11 @@
 window.addEventListener("DOMContentLoaded",function(){
-  const ctx = document.getElementById('myChart');
 
-  let data = document.getElementById("chart-data").innerHTML;
-  const labels = Object.keys(data);
-  const values = Object.values(data);
+    let data = document.getElementById("chart-data").innerHTML;
+    data = JSON.parse(data);
+    const labels = Object.keys(data);
+    const values = Object.values(data);
 
+    const ctx = document.getElementById('myChart');
     new Chart(ctx, {
         type: 'pie',
         data: {
