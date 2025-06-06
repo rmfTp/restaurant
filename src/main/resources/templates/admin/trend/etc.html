@@ -8,29 +8,23 @@
 </th:block>
 
 <section layout:fragment="content">
-    <h1>오늘의 트렌드</h1>
-    <form method="get">
-        사이트 주소 :
-        <input type="text" name="siteUrl" th:field="*{siteUrl}">
-        <button type="submit">조회하기</button>
-    </form>
-<!--1.<img th:src="*{wordCloud}">-->
-<!--2.<div id="chart-wrap">-->파이
-<!--      <canvas id="myChart"></canvas>-->
-<!--  </div>-->
-    <h2>일주일 간의 누적 트렌드</h2>
-<!--1.<img th:src="*{wordCloud}">-->
-<!--2.<div id="chart-wrap">-->일자별 키워드별
-<!--      <canvas id="myChart"></canvas>-->
-<!--  </div>-->
-    <h2>한달 간의 누적 트렌드</h2>
-    <!--1.<img th:src="*{wordCloud}">-->
-    <!--2.<div id="chart-wrap">-->일자별 키워드별
-    <!--      <canvas id="myChart"></canvas>-->
-    <!--  </div>-->
     <div id="chart-wrap">
+        <h1>오늘의 트렌드</h1>
+        <form method="get">
+            사이트 주소 :
+            <input type="text" name="siteUrl" th:field="*{siteUrl}">
+            <button type="submit">조회하기</button>
+        </form>
+        <img th:src="*{wordCloud}">
+        <canvas id="myChart"></canvas>
+        <h2>일주일 간의 누적 트렌드</h2>
+        <img th:src="*{wordCloud}">
+        <canvas id="myChart"></canvas>
+        <h2>한달 간의 누적 트렌드</h2>
+        <img th:src="*{wordCloud}">
         <canvas id="myChart"></canvas>
     </div>
     <script type="application/json" id="chart-data" th:utext="*{keywords}"></script>
+    <script type="application/json" id="chart-date" th:utext="*{createdAt}"></script>
 </section>
 </html>
