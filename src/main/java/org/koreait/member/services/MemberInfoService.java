@@ -1,25 +1,36 @@
 package org.koreait.member.services;
 
 import lombok.RequiredArgsConstructor;
+import org.koreait.global.search.ListData;
 import org.koreait.member.MemberInfo;
 import org.koreait.member.constants.Authority;
+import org.koreait.member.controllers.MemberSearch;
 import org.koreait.member.entities.Member;
 import org.koreait.member.repositories.MemberRepository;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Lazy
 @Service
 @RequiredArgsConstructor
 public class MemberInfoService implements UserDetailsService {
     private final MemberRepository repository;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -31,7 +42,92 @@ public class MemberInfoService implements UserDetailsService {
         List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(authority.name()));
 
         return MemberInfo.builder()
-                .email(member.getEmail()).password(member.getPassword()).member(member).authorities(authorities)
+                .email(member.getEmail())
+                .password(member.getPassword())
+                .member(member)
+                .authorities(authorities)
                 .build();
+    }
+
+    /**
+     * 회원 목록
+     * @param search
+     * @return
+     */
+    public ListData<Member> getList(MemberSearch search){
+        int page = Math.max(search.getPage(),1);
+        int limit = search.getLimit();
+        limit = limit < 1 ? 20 : limit;
+        int offset = (page - 1) * limit;//레코드 시작 번호
+
+
+        List<String> addWhere = new ArrayList<>();
+        List<Object> params = new ArrayList<>();
+
+        String sopt = search.getSopt();
+        String skey = search.getSkey();
+        sopt = StringUtils.hasText(sopt) ? sopt : "ALL";// 검색옵선 기본값은 통합 검색
+
+        if (StringUtils.hasText(skey)){//키워드 검색
+            if (sopt.equalsIgnoreCase("name")){
+                addWhere.add("name LIKE ?");
+            }else if(sopt.equalsIgnoreCase("email")){
+                addWhere.add("email LIKE ?");
+            }else if(sopt.equalsIgnoreCase("mobile")){
+                addWhere.add("mobile LIKE ?");
+            }else {//통합검색
+                addWhere.add("CONCAT(name, email, mobile) LIKE ?");
+            }
+
+            params.add("%"+skey+"%");
+        }
+
+        List<Authority> authorities = search.getAuthority();
+        if (!authorities.isEmpty()){
+            addWhere.add("authority IN (" + Stream.generate(() -> "?").limit(authorities.size()).collect(Collectors.joining(","))+")");
+
+            authorities.forEach(authority -> params.add(authority.name()));
+        }
+
+        params.add(offset);
+        params.add(limit);
+        StringBuffer sb = new StringBuffer(2000);
+        sb.append("SELECT * FROM MEMBER");
+
+        if (addWhere.isEmpty()){
+            sb.append(" WHERE ");
+            sb.append(String.join(" AND ", addWhere));// SQL문의 문법을 위해 양옆에 띄어쓰기
+        }
+
+        sb.append("ORDER BY createdAt DESC");
+        sb.append("LIMIT ?, ?");
+
+        List<Member> itmes = jdbcTemplate.query(sb.toString(), this::mapper, params.toArray());
+
+        return null;
+    }
+
+    private Member mapper(ResultSet rs, int i) throws SQLException{
+        // 기본 정의
+        Member item = new Member();
+        item.setSeq(rs.getLong("seq"));
+        item.setName(rs.getString("name"));
+        item.setEmail(rs.getString("email"));
+        item.setMobile(rs.getString("mobile"));
+        item.setAuthority(Authority.valueOf(rs.getString("authority")));
+        item.setLocked(rs.getBoolean("locked"));
+        Timestamp expired = rs.getTimestamp("expired");
+        Timestamp credentialChangedAt = rs.getTimestamp("credentialChangedAt");
+        Timestamp createdAt = rs.getTimestamp("createdAt");
+        Timestamp modifiedAt = rs.getTimestamp("modifiedAt");
+        Timestamp deletedAt = rs.getTimestamp("deletedAt");
+        // 필수 x 값 지정
+        item.setExpired(expired == null ? null : expired.toLocalDateTime());
+        item.setCredentialChangedAt(credentialChangedAt == null ? null : credentialChangedAt.toLocalDateTime());
+        item.setCredentialChangedAt(createdAt == null ? null : createdAt.toLocalDateTime());
+        item.setCredentialChangedAt(modifiedAt == null ? null : modifiedAt.toLocalDateTime());
+        item.setCredentialChangedAt(deletedAt == null ? null : deletedAt.toLocalDateTime());
+
+        return null;
     }
 }

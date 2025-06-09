@@ -8,4 +8,8 @@ import java.time.LocalDate;
 public class CommonSearch {
     private LocalDate sDate;
     private LocalDate eDate;
+    private String sopt;
+    private String skey;
+    private int page;
+    private int limit;
 }
