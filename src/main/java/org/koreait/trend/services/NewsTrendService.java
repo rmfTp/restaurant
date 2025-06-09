@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.koreait.global.configs.FileProperties;
 import org.koreait.global.configs.PythonProperties;
-import org.koreait.trend.entities.NewsTrend;
+import org.koreait.trend.entities.CollectedTrend;
 import org.koreait.trend.entities.Trend;
 import org.koreait.trend.repositories.TrendRepository;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -32,7 +32,7 @@ public class NewsTrendService {
     private final HttpServletRequest request;
     private final ObjectMapper om;
 
-    public NewsTrend process(){
+    public CollectedTrend process(){
         boolean isProduction = Arrays.stream(ctx.getEnvironment().getActiveProfiles())
                 .anyMatch(s -> s.equals("prod"));
 
@@ -55,7 +55,7 @@ public class NewsTrendService {
                 int statusCode = process.waitFor();
                 if (statusCode == 0){
                     String json = process.inputReader().lines().collect(Collectors.joining());
-                    return om.readValue(json, NewsTrend.class);
+                    return om.readValue(json, CollectedTrend.class);
                 }else {
 //                    System.out.println("statusCode:"+statusCode);
 //                    process.errorReader().lines().forEach(System.out::println);
@@ -72,7 +72,7 @@ public class NewsTrendService {
      */
     @Scheduled(fixedRate = 1L, timeUnit = TimeUnit.HOURS)
     public void scheduledJob() throws JsonProcessingException {
-        NewsTrend item = process();
+        CollectedTrend item = process();
         if (item == null)return;
 
         String wordCloud = String.format("%s%s/trend/%s", request.getContextPath(), fileProperties.getUrl(), item.getImage());

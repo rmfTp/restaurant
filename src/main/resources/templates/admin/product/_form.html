@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layouts/main}">
+<th:block th:fragment="common" th:object="${requestProduct}">
+    <div class="errors globla" th:each="err:${#fields.globalErrors()}">
+    </div>
+    <table class="table-cols">
+        <tr>
+            <th width="120px">상품명</th>
+            <td>
+                <input type="text" name="name" th:feild="*{name}">
+                <div class="errors" th:each="err:${#fields.errors('name')}" th:text="${err}"></div>
+            </td>
+            <td>
+                <input type="text" name="category" th:feild="*{category}">
+                <div class="errors" th:each="err:${#fields.errors('category')}" th:text="${err}"></div>
+            </td>
+        </tr>
+        <tr>
+            <th>상품상태</th>
+            <td></td>
+            <td>
+        </tr>
+        <tr>
+            <th>소비자가</th>
+                <input type="number" name="consumerPrice" th:feild="*{consumerPrice}">
+                <div class="errors" th:each="err:${#fields.errors('consumerPrice')}" th:text="${err}"></div>
+            </td>
+        </tr>
+        <tr>
+            <th>판매가</th>
+            <td>
+                <input type="number" name="salePrice" th:feild="*{salePrice}">
+                <div class="errors" th:each="err:${#fields.errors('salePrice')}" th:text="${err}"></div>
+            </td>
+        </tr>
+        <tr>
+            <th>상품설명</th>
+            <td>
+                <textarea id="description" name="description" th:feild="*{description}"></textarea>
+                <div class="errors" th:each="err:${#fields.errors('description')}" th:text="${err}"></div>
+            </td>
+        </tr>
+    </table>
+</th:block>
+</html>
