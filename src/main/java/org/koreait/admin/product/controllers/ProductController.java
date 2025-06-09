@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.koreait.admin.global.controllers.CommonController;
 import org.koreait.admin.product.constants.ProductStatus;
+import org.koreait.admin.product.services.ProductUpdateService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -19,6 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/admin/product")
 public class ProductController extends CommonController {
+    private final ProductUpdateService updateService;
 
     @Override
     @ModelAttribute("mainCode")
@@ -45,6 +47,7 @@ public class ProductController extends CommonController {
     public String register(@ModelAttribute RequestProduct form, Model model){
         commonProcess("register",model);
         form.setGid(UUID.randomUUID().toString());
+        form.setStatus(ProductStatus.READY);
         return "admin/product/register";
     }
     @GetMapping("/update/{seq}")
@@ -59,6 +62,7 @@ public class ProductController extends CommonController {
         if(errors.hasErrors()){
             return "admin/product/" + (mode.equals("edit") ? "update" : "register");
         }
+        updateService.process(form);
         return "redirect:/admin/product";
     }
 

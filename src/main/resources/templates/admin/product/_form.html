@@ -5,7 +5,7 @@
 <th:block th:fragment="common" th:object="${requestProduct}">
     <div class="errors globla" th:each="err:${#fields.globalErrors()}">
     </div>
-    <table class="table-cols">
+    <table class="table-cols mb30">
         <tr>
             <th width="120px">상품명</th>
             <td>
@@ -19,11 +19,16 @@
         </tr>
         <tr>
             <th>상품상태</th>
-            <td></td>
             <td>
+                <span th:each="status : ${statusList}">
+                    <input type="radio" name="status" th:id="${'status-' + satus.name()}" th:value="${satus.name()}" th:field="*{satus}">
+                    <label th:for="${'status-' + satus.name()}" th:text="${#message.msg('productStatus.'+status.name())}"></label>
+                </span>
+            </td>
         </tr>
         <tr>
             <th>소비자가</th>
+            <td>
                 <input type="number" name="consumerPrice" th:feild="*{consumerPrice}">
                 <div class="errors" th:each="err:${#fields.errors('consumerPrice')}" th:text="${err}"></div>
             </td>
