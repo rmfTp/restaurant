@@ -1,7 +1,9 @@
 package org.koreait.member.services;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.koreait.global.search.ListData;
+import org.koreait.global.search.Pagination;
 import org.koreait.member.MemberInfo;
 import org.koreait.member.constants.Authority;
 import org.koreait.member.controllers.MemberSearch;
@@ -31,6 +33,7 @@ import java.util.stream.Stream;
 public class MemberInfoService implements UserDetailsService {
     private final MemberRepository repository;
     private final JdbcTemplate jdbcTemplate;
+    private final HttpServletRequest request;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -83,28 +86,35 @@ public class MemberInfoService implements UserDetailsService {
         }
 
         List<Authority> authorities = search.getAuthority();
-        if (!authorities.isEmpty()){
+        if (authorities != null && !authorities.isEmpty()){
             addWhere.add("authority IN (" + Stream.generate(() -> "?").limit(authorities.size()).collect(Collectors.joining(","))+")");
 
             authorities.forEach(authority -> params.add(authority.name()));
         }
 
-        params.add(offset);
-        params.add(limit);
         StringBuffer sb = new StringBuffer(2000);
+        StringBuffer sb2 = new StringBuffer(2000);
         sb.append("SELECT * FROM MEMBER");
+        sb2.append("SELECT COUNT (*) FROM MEMBER");
 
         if (addWhere.isEmpty()){
-            sb.append(" WHERE ");
-            sb.append(String.join(" AND ", addWhere));// SQL문의 문법을 위해 양옆에 띄어쓰기
+            String where = " WHERE " + String.join(" AND ", addWhere);
+            sb.append(where);
+            sb2.append(where);// SQL문의 문법을 위해 양옆에 띄어쓰기
         }
 
         sb.append("ORDER BY createdAt DESC");
         sb.append("LIMIT ?, ?");
 
+        params.add(offset);
+        params.add(limit);
+
         List<Member> itmes = jdbcTemplate.query(sb.toString(), this::mapper, params.toArray());
 
-        return null;
+        int total = jdbcTemplate.queryForObject(sb2.toString(), int.class);
+
+        Pagination pagination = new Pagination(page, total, 10, 20, request);
+        return new ListData<>(itmes,pagination);
     }
 
     private Member mapper(ResultSet rs, int i) throws SQLException{
