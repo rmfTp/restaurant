@@ -95,16 +95,16 @@ public class MemberInfoService implements UserDetailsService {
         StringBuffer sb = new StringBuffer(2000);
         StringBuffer sb2 = new StringBuffer(2000);
         sb.append("SELECT * FROM MEMBER");
-        sb2.append("SELECT COUNT (*) FROM MEMBER");
+        sb2.append("SELECT COUNT(*) FROM MEMBER");
 
-        if (addWhere.isEmpty()){
+        if (!addWhere.isEmpty()){
             String where = " WHERE " + String.join(" AND ", addWhere);
             sb.append(where);
             sb2.append(where);// SQL문의 문법을 위해 양옆에 띄어쓰기
         }
 
-        sb.append("ORDER BY createdAt DESC");
-        sb.append("LIMIT ?, ?");
+        sb.append(" ORDER BY createdAt DESC");
+        sb.append(" LIMIT ?, ?");
 
         params.add(offset);
         params.add(limit);

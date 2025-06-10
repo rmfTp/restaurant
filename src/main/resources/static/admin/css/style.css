@@ -120,5 +120,32 @@ main > .main-content > nav a.on{
      resize: none;
      width: 100%;
  }
+ input[type='checkbox'] + label.standalone{
+    padding:0;
+    width:23px;
+    weight:23px;
+ }
 
+ .pagination{
+    display:flex;
+    justify-content:center;
+    height:45px;
+    margin:25px 0;
+ }
+ .pagination a{
+    min-width:45px;
+    padding:0 10px;
+    border:1px solid #000;
+    border-radius:3px;
+    line-height:43px;
+    font-size:1.2rm
+ }
 
+ .pagination > a + a{
+    margin-left:3px;
+ }
+
+ .pagination a.on{
+    background:#000;
+    color:#fff;
+ }
