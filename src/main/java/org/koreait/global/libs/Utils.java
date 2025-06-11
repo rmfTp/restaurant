@@ -70,4 +70,8 @@ public class Utils {
 
         return messageSource.getMessage(code, null, locale);
     }
+
+    public String getParams(String name){
+        return request.getParameter(name);
+    }
 }

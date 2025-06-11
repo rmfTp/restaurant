@@ -56,6 +56,8 @@ public class SecurityConfig {
             c.accessDeniedHandler(new MemberAccessDeniedHandler());
         });
 
+        http.headers(c -> c.frameOptions(f -> f.sameOrigin()));
+
         return http.build();
     }
 

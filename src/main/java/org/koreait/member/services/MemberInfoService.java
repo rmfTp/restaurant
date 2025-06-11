@@ -31,14 +31,14 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 public class MemberInfoService implements UserDetailsService {
+
     private final MemberRepository repository;
     private final JdbcTemplate jdbcTemplate;
     private final HttpServletRequest request;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Member member = repository.findByEmail(username)
-                .orElseThrow(()->new UsernameNotFoundException(username));
+        Member member = repository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException(username));
 
         Authority authority = Objects.requireNonNullElse(member.getAuthority(), Authority.MEMBER);
 
@@ -54,14 +54,15 @@ public class MemberInfoService implements UserDetailsService {
 
     /**
      * 회원 목록
+     *
      * @param search
      * @return
      */
-    public ListData<Member> getList(MemberSearch search){
-        int page = Math.max(search.getPage(),1);
+    public ListData<Member> getList(MemberSearch search) {
+        int page = Math.max(search.getPage(), 1);
         int limit = search.getLimit();
         limit = limit < 1 ? 20 : limit;
-        int offset = (page - 1) * limit;//레코드 시작 번호
+        int offset = (page - 1) * limit; // 레코드 시작 번호
 
 
         List<String> addWhere = new ArrayList<>();
@@ -69,56 +70,71 @@ public class MemberInfoService implements UserDetailsService {
 
         String sopt = search.getSopt();
         String skey = search.getSkey();
-        sopt = StringUtils.hasText(sopt) ? sopt : "ALL";// 검색옵선 기본값은 통합 검색
-
-        if (StringUtils.hasText(skey)){//키워드 검색
-            if (sopt.equalsIgnoreCase("name")){
+        sopt = StringUtils.hasText(sopt) ? sopt : "ALL";
+        /**
+         * 키워드 검색
+         * sopt: 검색 옵션
+         *      NAME : 회원명
+         *      EMAIL : 이메일
+         *      MOBILE : 휴대전화번호
+         *      ALL : 통합 검색 - NAME + EMAIL + MOBILE
+         */
+        if (StringUtils.hasText(skey)) { // 검색 키워드가 있는 경우
+            if (sopt.equalsIgnoreCase("NAME")) { // 회원명 검색
                 addWhere.add("name LIKE ?");
-            }else if(sopt.equalsIgnoreCase("email")){
+            } else if (sopt.equalsIgnoreCase("EMAIL")) { // 이메일 주소 검색
                 addWhere.add("email LIKE ?");
-            }else if(sopt.equalsIgnoreCase("mobile")){
+            } else if (sopt.equalsIgnoreCase("MOBILE")) { // 휴대전화번호 검색
                 addWhere.add("mobile LIKE ?");
-            }else {//통합검색
+            } else { // 통합 검색
                 addWhere.add("CONCAT(name, email, mobile) LIKE ?");
             }
 
-            params.add("%"+skey+"%");
+            params.add("%" + skey + "%");
         }
 
+        // 권한 조건 검색 S
         List<Authority> authorities = search.getAuthority();
-        if (authorities != null && !authorities.isEmpty()){
-            addWhere.add("authority IN (" + Stream.generate(() -> "?").limit(authorities.size()).collect(Collectors.joining(","))+")");
+        if (authorities != null && !authorities.isEmpty()) {
 
-            authorities.forEach(authority -> params.add(authority.name()));
+            addWhere.add(" authority IN (" + Stream.generate(() -> "?").limit(authorities.size()).collect(Collectors.joining(",")) + ")");
+
+            authorities.forEach(authority ->  params.add(authority.name()));
+
         }
+        // 권한 조건 검색 E
 
         StringBuffer sb = new StringBuffer(2000);
         StringBuffer sb2 = new StringBuffer(2000);
         sb.append("SELECT * FROM MEMBER");
         sb2.append("SELECT COUNT(*) FROM MEMBER");
 
-        if (!addWhere.isEmpty()){
+        if (!addWhere.isEmpty()) {
             String where = " WHERE " + String.join(" AND ", addWhere);
             sb.append(where);
-            sb2.append(where);// SQL문의 문법을 위해 양옆에 띄어쓰기
+            sb2.append(where);
         }
 
         sb.append(" ORDER BY createdAt DESC");
         sb.append(" LIMIT ?, ?");
 
+
+        int total = jdbcTemplate.queryForObject(sb2.toString(), int.class, params.toArray()); // 검색 조건에 다른 전체 레코드 갯수
+
         params.add(offset);
         params.add(limit);
 
-        List<Member> itmes = jdbcTemplate.query(sb.toString(), this::mapper, params.toArray());
+        List<Member> items = jdbcTemplate.query(sb.toString(), this::mapper, params.toArray());
 
-        int total = jdbcTemplate.queryForObject(sb2.toString(), int.class);
+
 
         Pagination pagination = new Pagination(page, total, 10, 20, request);
-        return new ListData<>(itmes,pagination);
+
+
+        return new ListData<>(items, pagination);
     }
 
-    private Member mapper(ResultSet rs, int i) throws SQLException{
-        // 기본 정의
+    private Member mapper(ResultSet rs, int i) throws SQLException {
         Member item = new Member();
         item.setSeq(rs.getLong("seq"));
         item.setName(rs.getString("name"));
@@ -131,13 +147,13 @@ public class MemberInfoService implements UserDetailsService {
         Timestamp createdAt = rs.getTimestamp("createdAt");
         Timestamp modifiedAt = rs.getTimestamp("modifiedAt");
         Timestamp deletedAt = rs.getTimestamp("deletedAt");
-        // 필수 x 값 지정
+
         item.setExpired(expired == null ? null : expired.toLocalDateTime());
         item.setCredentialChangedAt(credentialChangedAt == null ? null : credentialChangedAt.toLocalDateTime());
-        item.setCredentialChangedAt(createdAt == null ? null : createdAt.toLocalDateTime());
-        item.setCredentialChangedAt(modifiedAt == null ? null : modifiedAt.toLocalDateTime());
-        item.setCredentialChangedAt(deletedAt == null ? null : deletedAt.toLocalDateTime());
+        item.setCreatedAt(createdAt == null ? null : createdAt.toLocalDateTime());
+        item.setModifiedAt(modifiedAt == null ? null : modifiedAt.toLocalDateTime());
+        item.setDeletedAt(deletedAt == null ? null : deletedAt.toLocalDateTime());
 
-        return null;
+        return item;
     }
 }
