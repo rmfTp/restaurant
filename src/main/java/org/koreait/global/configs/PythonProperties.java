@@ -7,5 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "python.path")
 public class PythonProperties {
     private String base;
+    private String base2;
     private String trend;
+    private String restaurant;
 }
