@@ -64,29 +64,26 @@ public class DiabetesSurveyPredictService {
     }
     public boolean isDiabetes(RequestDiabetesSurvey form){
         List<Number> item = new ArrayList<>();
-
         item.add(form.getGender().getNum());
         item.add(form.getAge());
-        item.add(form.isHypertension()?1:0);
-        item.add(form.isHeartDisease()?1:0);
+        item.add(form.isHypertension() ? 1 : 0);
+        item.add(form.isHeartDisease() ? 1 : 0);
         item.add(form.getSmokingHistory().getNum());
-        double weight = form.getWeight();
-        double height = form.getHeight();
-        // BMI 계산
+
+        // BMI 지수 계산
         double bmi = getBmi(form.getHeight(), form.getWeight());
         item.add(bmi);
-        item.add(form.getHbA1c());
-        item.add(form.getBloodGlucoseLevel());
-        System.out.println("item:"+item);
+
+        item.add(form.getHbA1c()); // 당화혈색소 수치
+        item.add(form.getBloodGlucoseLevel()); // 혈당 수치
 
         return isDiabetes(item);
     }
 
-    public double getBmi(double height,double weight){
-        height = height/100.0;     // 2번째 자릿수
-        double bmi = Math.round(                // 반올림
-                (weight / Math.pow(height, 2))  // 몸무게 나누기 키의 제곱
-                        * 100.0) / 100.0;
-        return bmi;
+    // BMI 지수 계산
+    public double getBmi(double height, double weight) {
+        height = height / 100.0;
+
+        return Math.round((weight / Math.pow(height, 2.0)) * 100.0) / 100.0;
     }
 }
