@@ -11,7 +11,7 @@ import org.koreait.member.entities.Member;
 import org.koreait.member.libs.MemberUtil;
 import org.koreait.survey.diabetes.constants.SmokingHistory;
 import org.koreait.survey.diabetes.entities.DiabetesSurvey;
-import org.koreait.survey.exceoptions.SurveyNotFoundException;
+import org.koreait.survey.exceptions.SurveyNotFoundException;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;

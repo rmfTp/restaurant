@@ -1,4 +1,4 @@
-package org.koreait.survey.exceoptions;
+package org.koreait.survey.exceptions;
 
 import org.koreait.global.exceptions.script.AlertBackException;
 import org.springframework.http.HttpStatus;
