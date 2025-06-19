@@ -30,19 +30,17 @@ public class DiabetesSurveyInfoService {
     private final HttpServletRequest request;
 
     public DiabetesSurvey get(Long seq) {
-        DiabetesSurvey item;
         try {
-            String sql = "SELECT s.*, m.email, m.name, m.mobile FROM SURVEY_DIABETES s" +
-                    "LEFT JOIN MEMBER m ON s,memberSeq = m.seq WHERE s.seq = ?";
-            item = jdbcTemplate.queryForObject(sql, this::mapper, seq);
+            String sql = "SELECT s.*, m.email, m.name, m.mobile FROM SURVEY_DIABETES s " +
+                    " LEFT JOIN MEMBER m ON s.memberSeq = m.seq WHERE s.seq = ?";
+            DiabetesSurvey item = jdbcTemplate.queryForObject(sql, this::mapper, seq);
 
             Member member = memberUtil.getMember();
-            if (!memberUtil.isLogin() || (!memberUtil.isAdmin() && !member.getSeq().equals(item.getMemberSeq())))
-                throw new UnAuthorizedException();
+            if (!memberUtil.isLogin() || (!memberUtil.isAdmin() && !member.getSeq().equals(item.getMemberSeq())))throw new UnAuthorizedException();
+            return item;
         } catch (DataAccessException e) {
             throw new SurveyNotFoundException();
         }
-        return item;
     }
 
     public ListData<DiabetesSurvey> getList(CommonSearch search){
@@ -52,7 +50,7 @@ public class DiabetesSurveyInfoService {
         int offset = (page - 1) * limit;
         Member member = memberUtil.getMember();
         String sql = "SELECT s.*, m.email, m.name, m.mobile FROM SURVEY_DIABETES s" +
-                "LEFT JOIN MEMBER m ON s,memberSeq = m.seq WHERE seq = ?" +
+                "LEFT JOIN MEMBER m ON s.memberSeq = m.seq WHERE memberSeq = ?" +
                 "ORDER BY s.createdAt DESC LIMIT ?, ?";
 
         List<DiabetesSurvey> items = jdbcTemplate.query(sql, this::mapper, member.getSeq(),offset,limit);
@@ -61,11 +59,11 @@ public class DiabetesSurveyInfoService {
         return new ListData<>(items,pagination);
     }
 
-    private DiabetesSurvey mapper(ResultSet rs, int i)throws SQLException{
+    private DiabetesSurvey mapper(ResultSet rs, int i) throws SQLException {
         DiabetesSurvey item = new DiabetesSurvey();
         item.setSeq(rs.getLong("seq"));
         item.setMemberSeq(rs.getLong("memberSeq"));
-        item.setGender(Gender.valueOf(rs.getString("memberSeq")));
+        item.setGender(Gender.valueOf(rs.getString("gender")));
         item.setAge(rs.getInt("age"));
         item.setDiabetes(rs.getBoolean("diabetes"));
         item.setBmi(rs.getDouble("bmi"));
