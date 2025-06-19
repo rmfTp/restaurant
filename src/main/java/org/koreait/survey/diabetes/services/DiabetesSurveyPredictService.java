@@ -1,17 +1,16 @@
-package org.koreait.restaurant.services;
+package org.koreait.survey.diabetes.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.koreait.global.configs.PythonProperties;
-import org.koreait.restaurant.controllers.RestaurantSearch;
-import org.koreait.restaurant.entities.Restaurant;
-import org.koreait.restaurant.repositories.RestaurantRepository;
+import org.koreait.survey.diabetes.controllers.RequestDiabetesSurvey;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,24 +19,12 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @EnableConfigurationProperties(PythonProperties.class)
-public class RestaurantInfoService {
+public class DiabetesSurveyPredictService {
     private final PythonProperties properties;
     private final WebApplicationContext ctx;
-    private final RestaurantRepository repository;
     private final ObjectMapper om;
 
-    /**
-     * 근처 식당 조회
-     * @param lat 위도
-     * @param lon 경도
-     * @param cnt 식당갯수
-     * @return
-     */
-    public List<Restaurant> getNestest(double lat, double lon, int cnt){
-        if (lat < -90.0 || lat > 90.0) lat = ((lat + 90.0) % 180.0) - 90.0;  // 위도를 -90 ~ +90 사이로 보정
-        if (lon < 0.0 || lon >= 360.0) lon = (lon + 360.0) % 360.0;  // 경도를 0 ~ 360 사이로 보정
-        if (lat == 0 || lon == 0) return List.of();
-
+    public List<Integer> process(List<List<Number>> items){
         boolean isProduction = Arrays.stream(ctx.getEnvironment().getActiveProfiles()).anyMatch(s -> s.equals("prod") || s.equals("mac"));
 
         String activationCommand = null, pythonPath = null;
@@ -53,13 +40,13 @@ public class RestaurantInfoService {
             ProcessBuilder builder = isProduction ? new ProcessBuilder("/bin/sh", activationCommand) : new ProcessBuilder(activationCommand); // 가상환경 활성화
             Process process = builder.start();
             if (process.waitFor() == 0) { // 정상 수행된 경우
-                builder = new ProcessBuilder(pythonPath, properties.getRestaurant() + "/search.py","" + lat,"" + lon, "" + cnt);
+                String data = om.writeValueAsString(items);
+                builder = new ProcessBuilder(pythonPath, properties.getRestaurant() + "/diabetes/predict.py",data);
                 process = builder.start();
                 int statusCode = process.waitFor();
                 if (statusCode == 0) {
                     String json = process.inputReader().lines().collect(Collectors.joining());
-                    List<Long> seqs = om.readValue(json, new TypeReference<>() {});
-                    return repository.findAllById(seqs);
+                    return om.readValue(json, new TypeReference<>() {});
                 } else {
                     System.out.println("statusCode:" + statusCode);
                     process.errorReader().lines().forEach(System.out::println);
@@ -70,15 +57,36 @@ public class RestaurantInfoService {
         }
         return List.of(); // 실패시
     }
+    public boolean isDiabetes(List<Number> item){
+        List<Integer> results = process(List.of(item));
 
-    public List<Restaurant> getNearest(double lat, double lon){
-        return getNestest(lat,lon,10);
+        return !results.isEmpty() && results.getFirst() == 1;
+    }
+    public boolean isDiabetes(RequestDiabetesSurvey form){
+        List<Number> item = new ArrayList<>();
+
+        item.add(form.getGender().getNum());
+        item.add(form.getAge());
+        item.add(form.isHypertension()?1:0);
+        item.add(form.isHeartDisease()?1:0);
+        item.add(form.getSmokingHistory().getNum());
+        double weight = form.getWeight();
+        double height = form.getHeight();
+        // BMI 계산
+        double bmi = getBmi(form.getHeight(), form.getWeight());
+        item.add(bmi);
+        item.add(form.getHbA1c());
+        item.add(form.getBloodGlucoseLevel());
+        System.out.println("item:"+item);
+
+        return isDiabetes(item);
     }
 
-    public List<Restaurant> getNearest(RestaurantSearch search){
-        int cnt = search.getCnt();
-        cnt = cnt < 1 ? 10 : cnt;
-        return getNestest(search.getLat(), search.getLon(), cnt);
+    public double getBmi(double height,double weight){
+        height = height/100.0;     // 2번째 자릿수
+        double bmi = Math.round(                // 반올림
+                (weight / Math.pow(height, 2))  // 몸무게 나누기 키의 제곱
+                        * 100.0) / 100.0;
+        return bmi;
     }
-
 }

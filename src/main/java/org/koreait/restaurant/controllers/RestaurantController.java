@@ -30,13 +30,14 @@ public class RestaurantController {
     public String list(@ModelAttribute RestaurantSearch search, Model model) {
         commonProcess("list", model);
 
-        List<Restaurant> items = infoService.getNearest(search);
-        model.addAttribute("items", items);
-        try {
-            model.addAttribute("json", om.writeValueAsString(items));
-        } catch (Exception e){}
-
         return utils.tpl("restaurant/list");
+    }
+
+    @ResponseBody
+    @GetMapping("/search")
+    public List<Restaurant> search(@ModelAttribute RestaurantSearch search){
+        List<Restaurant> items = infoService.getNearest(search);
+        return items;
     }
 
     @ResponseBody
@@ -56,14 +57,17 @@ public class RestaurantController {
         String pageTitle = "";
         List<String> addCss = new ArrayList<>();
         List<String> addScript = new ArrayList<>();
+        List<String> addCommonScript = new ArrayList<>();
 
         if (mode.equals("list")){
             pageTitle = utils.getMessage("오늘의_식당");
             addCss.add("restaurant/list");
             addScript.add("restaurant/list");
+            addScript.add("map");
         }
         model.addAttribute("pageTitle", pageTitle);
         model.addAttribute("addCss", addCss);
         model.addAttribute("addScript", addScript);
+        model.addAttribute("addSCommoncript", addScript);
     }
 }
