@@ -45,7 +45,7 @@ public class SecurityConfig {
          * hasAnyRole : 다수의 권한(role) 중 하나 이상 필요
          */
         http.authorizeHttpRequests(c -> {
-            c.requestMatchers("/mypage/**").authenticated()
+            c.requestMatchers("/mypage/**", "/survey/diabetes/**").authenticated()
                     .requestMatchers("/mypage/join","/member/login").anonymous()
                   //.requestMatchers("/admin/**").hasAuthority("ADMIN")
                     .anyRequest().permitAll();

@@ -52,7 +52,7 @@ public class DiabetesSurveyController {
         return SmokingHistory.values();
     }
 
-    @GetMapping("/step1")
+    @GetMapping({"", "/step1"})
     public String step1(@ModelAttribute RequestDiabetesSurvey form, Model model) {
         commonProcess("step", model);
         model.addAttribute("requestDiabetesSurvey", form);
@@ -68,11 +68,6 @@ public class DiabetesSurveyController {
         }
 
         return utils.tpl("survey/diabetes/step2");
-    }
-    @PostMapping("/result")
-    public String result(@Valid RequestDiabetesSurvey form, Errors errors, Model model) {
-
-        return utils.tpl("survey/diabetes/result");
     }
 
 
@@ -93,11 +88,11 @@ public class DiabetesSurveyController {
             return utils.tpl("survey/diabetes/step2");
         }
 
-        surveyService.process(form);
+        DiabetesSurvey item = surveyService.process(form);
 
         status.setComplete();
 
-        return "redirect:/survey/diabetes/result/설문번호";
+        return "redirect:/survey/diabetes/result/" + item.getSeq();
     }
 
     @GetMapping("/result/{seq}")

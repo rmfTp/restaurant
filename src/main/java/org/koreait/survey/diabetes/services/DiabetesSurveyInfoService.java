@@ -3,6 +3,7 @@ package org.koreait.survey.diabetes.services;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.koreait.global.constants.Gender;
+import org.koreait.global.exceptions.UnAuthorizedException;
 import org.koreait.global.search.CommonSearch;
 import org.koreait.global.search.ListData;
 import org.koreait.global.search.Pagination;
@@ -28,14 +29,20 @@ public class DiabetesSurveyInfoService {
     private final MemberUtil memberUtil;
     private final HttpServletRequest request;
 
-    public DiabetesSurvey get(Long seq){
+    public DiabetesSurvey get(Long seq) {
+        DiabetesSurvey item;
         try {
             String sql = "SELECT s.*, m.email, m.name, m.mobile FROM SURVEY_DIABETES s" +
                     "LEFT JOIN MEMBER m ON s,memberSeq = m.seq WHERE s.seq = ?";
-            return jdbcTemplate.queryForObject(sql, this::mapper, seq);
-        }catch (DataAccessException e){
+            item = jdbcTemplate.queryForObject(sql, this::mapper, seq);
+
+            Member member = memberUtil.getMember();
+            if (!memberUtil.isLogin() || (!memberUtil.isAdmin() && !member.getSeq().equals(item.getMemberSeq())))
+                throw new UnAuthorizedException();
+        } catch (DataAccessException e) {
             throw new SurveyNotFoundException();
         }
+        return item;
     }
 
     public ListData<DiabetesSurvey> getList(CommonSearch search){
