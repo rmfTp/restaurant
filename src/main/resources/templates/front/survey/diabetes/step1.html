@@ -3,10 +3,6 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{front/layouts/main}">
 
-<th:block layout:fragment="addCss">
-    <link rel="stylesheet" type="text/css" th:href="@{/front/main/style.css}">
-</th:block>
-
 <main layout:fragment="content">
     <h1 th:text="${pageTitle}"></h1>
     <form name="frmStep" method="POST" th:action="@{/survey/diabetes/step2}" autocomplete="off" th:object="${requestDiabetesSurvey}">
@@ -16,17 +12,17 @@
             <dt th:text="#{성별}"></dt>
             <dd>
                 <span th:each="gen : ${genders}">
-                    <input type="radio" name="gender"th:value="${gen.name()}" th:field="*{gender}" th:id="${'gender-' + gen.name()}">
+                    <input type="radio" name="gender" th:value="${gen.name()}" th:field="*{gender}" th:id="${'gender-' + gen.name()}">
                     <label th:for="${'gender-' + gen.name()}" th:text="${#messages.msg(gen.name())}"></label>
                 </span>
-                <div class="error" th:each="err: ${#fields.errors('gender')}" th:text="${err}"></div>
+                <div class="error" th:each="err : ${#fields.errors('gender')}" th:text="${err}"></div>
             </dd>
         </dl>
         <dl>
             <dt th:text="#{나이}"></dt>
             <dd>
                 <input type="text" name="age" th:field="*{age}">
-                <div class="error" th:each="err: ${#fields.errors('age')}" th:text="${err}"></div>
+                <div class="error" th:each="err : ${#fields.errors('age')}" th:text="${err}"></div>
             </dd>
         </dl>
         <dl>
@@ -40,11 +36,11 @@
                     <input type="radio" name="hypertension" value="false" th:field="*{hypertension}" id="hypertension-false">
                     <label for="hypertension-false" th:text="#{없음}"></label>
                 </span>
-                <div class="error" th:each="err: ${#fields.errors('hypertension')}" th:text="${err}"></div>
+                <div class="error" th:each="err : ${#fields.errors('hypertension')}" th:text="${err}"></div>
             </dd>
         </dl>
         <dl>
-            <dt th:text="#{심장병_여부}"></dt>
+            <dt th:text="#{심장질환_여부}"></dt>
             <dd>
                 <span>
                     <input type="radio" name="heartDisease" value="true" th:field="*{heartDisease}" id="heartDisease-true">
@@ -54,7 +50,7 @@
                     <input type="radio" name="heartDisease" value="false" th:field="*{heartDisease}" id="heartDisease-false">
                     <label for="heartDisease-false" th:text="#{없음}"></label>
                 </span>
-                <div class="error" th:each="err: ${#fields.errors('heartDisease')}" th:text="${err}"></div>
+                <div class="error" th:each="err : ${#fields.errors('heartDisease')}" th:text="${err}"></div>
             </dd>
         </dl>
         <dl>
@@ -64,7 +60,7 @@
                     <input type="radio" name="smokingHistory" th:value="${item.name()}" th:field="*{smokingHistory}" th:id="${'smokingHistory-' + item.name()}">
                     <label th:for="${'smokingHistory-' + item.name()}" th:text="${#messages.msg('smokingHistory.' + item.name())}"></label>
                 </span>
-                <div class="error" th:each="err: ${#fields.errors('smokingHistory')}" th:text="${err}"></div>
+                <div class="error" th:each="err : ${#fields.errors('smokingHistory')}" th:text="${err}"></div>
             </dd>
         </dl>
         <button type="submit" th:text="#{다음_페이지}"></button>
