@@ -3,13 +3,9 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{front/layouts/main}">
 
-<th:block layout:fragment="addCss">
-    <link rel="stylesheet" type="text/css" th:href="@{/front/main/style.css}">
-</th:block>
-
 <main layout:fragment="content" th:object="${item}">
     <h1 th:text="${pageTitle}"></h1>
-    <div class="result-box" th:text="*{diabetes ? messages.msg('diabetes.HIGH') : messages.msg('diabetes.LOW')}"></div>
+    <div class="result-box" th:text="*{diabetes ? #messages.msg('diabetes.HIGH') : #messages.msg('diabetes.LOW')}"></div>
     <dl>
         <dt th:text="#{성별}"></dt>
         <dd th:text="*{#messages.msg(gender)}"></dd>
@@ -42,12 +38,12 @@
     </dl>
     <dl>
         <dt>
-            <th:block  th:text="#{당화혈색소_수치}"></th:block> /
-            <th:block  th:text="#{혈당_수치}"></th:block>
+            <th:block th:text="#{당화혈색소_수치}"></th:block> /
+            <th:block th:text="#{혈당_수치}"></th:block>
         </dt>
         <dd>
-            <th:block  th:text="*{hbA1c}"></th:block>% /
-            <th:block  th:text="*{bloodGlucoseLevel}"></th:block>mg/dL
+            <th:block th:text="*{hbA1c}"></th:block>% /
+            <th:block th:text="*{bloodGlucoseLevel}"></th:block> mg/dL
         </dd>
     </dl>
     <div class="button-group">
