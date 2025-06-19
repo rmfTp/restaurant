@@ -30,7 +30,7 @@ public class DiabetesSurveyController {
     private final DiabetesSurveyInfoService infoService;
 
     @ModelAttribute("addCss")
-    public List<String> addCss(){
+    public List<String> addCss() {
         return List.of("survey/diabetes/style");
     }
 
@@ -39,31 +39,34 @@ public class DiabetesSurveyController {
         RequestDiabetesSurvey form = new RequestDiabetesSurvey();
         form.setGender(Gender.FEMALE);
         form.setSmokingHistory(SmokingHistory.CURRENT);
-        return new RequestDiabetesSurvey();
+
+        return form;
     }
 
     @ModelAttribute("genders")
-    public Gender[] genders(){
+    public Gender[] genders() {
         return Gender.values();
     }
 
     @ModelAttribute("smokingHistories")
-    public SmokingHistory[] smokingHistories(){
+    public SmokingHistory[] smokingHistories() {
         return SmokingHistory.values();
     }
 
     @GetMapping({"", "/step1"})
     public String step1(@ModelAttribute RequestDiabetesSurvey form, Model model) {
         commonProcess("step", model);
-        model.addAttribute("requestDiabetesSurvey", form);
 
         return utils.tpl("survey/diabetes/step1");
     }
 
     @PostMapping("/step2")
     public String step2(@Valid RequestDiabetesSurvey form, Errors errors, Model model) {
+        commonProcess("step", model);
+
+        validator.validate(form, errors);
+
         if (errors.hasErrors()) {
-            commonProcess("step", model);
             return utils.tpl("survey/diabetes/step1");
         }
 
@@ -92,35 +95,37 @@ public class DiabetesSurveyController {
 
         status.setComplete();
 
+        model.addAttribute("requestDiabetesSurvey", requestDiabetesSurvey());
+
         return "redirect:/survey/diabetes/result/" + item.getSeq();
     }
 
     @GetMapping("/result/{seq}")
-    public String result(@PathVariable("seq") Long seq, Model model){
+    public String result(@PathVariable("seq") Long seq, Model model) {
         commonProcess("result", model);
 
         DiabetesSurvey item = infoService.get(seq);
-        model.addAttribute("item",item);
+        model.addAttribute("item", item);
+
 
         return utils.tpl("survey/diabetes/result");
     }
-
 
     /**
      * 컨트롤러 공통처리
      * @param mode
      * @param model
      */
-    private void commonProcess(String mode, Model model){
+    private void commonProcess(String mode, Model model) {
         mode = StringUtils.hasText(mode) ? mode : "step";
-
         String pageTitle = "";
-
-        if (mode.equals("step")){
+        if (mode.equals("step")) {
             pageTitle = utils.getMessage("당뇨_고위험군_테스트");
+
         } else if (mode.equals("result")) {
             pageTitle = utils.getMessage("당뇨_고위험군_테스트_결과");
         }
+
         model.addAttribute("pageTitle", pageTitle);
     }
 }
