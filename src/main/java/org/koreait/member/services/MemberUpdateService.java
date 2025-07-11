@@ -31,15 +31,15 @@ public class MemberUpdateService {
         String method = request.getMethod();
         List<Member> members = new ArrayList<>();
         for (int chk : chks) {
-            Long seq = Long.valueOf(utils.getParams("seq_" + chk));
+            Long seq = Long.valueOf(utils.getParam("seq_" + chk));
             Member member = repository.findById(seq).orElse(null);
             if (member == null) continue;
             if (method.equalsIgnoreCase("DELETE")) {
                 member.setDeletedAt(LocalDateTime.now());
             } else {
-                boolean updateCredentialAt = Boolean.parseBoolean(Objects.requireNonNullElse(utils.getParams("updateCredentialAt_" + chk),"false"));
+                boolean updateCredentialAt = Boolean.parseBoolean(Objects.requireNonNullElse(utils.getParam("updateCredentialAt_" + chk),"false"));
                 if (updateCredentialAt) member.setCredentialChangedAt(LocalDateTime.now());
-                boolean cancelResign = Boolean.parseBoolean(Objects.requireNonNullElse(utils.getParams("cancelResign_" + chk), "false"));
+                boolean cancelResign = Boolean.parseBoolean(Objects.requireNonNullElse(utils.getParam("cancelResign_" + chk), "false"));
                 if (cancelResign) {
                     member.setDeletedAt(null);
                 }
