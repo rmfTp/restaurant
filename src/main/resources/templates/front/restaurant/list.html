@@ -10,6 +10,22 @@
 <section layout:fragment="content">
     <h1 th:text="${pageTitle}"></h1>
     <div id="map"></div>
+    <!-- 카테고리 필터 -->
+    <form id="categoryForm" style="margin-bottom:20px;">
+        <div>
+            <label><input type="checkbox" name="category" value="한식"> 한식</label>
+            <label><input type="checkbox" name="category" value="중식"> 중식</label>
+            <label><input type="checkbox" name="category" value="일식"> 일식</label>
+            <label><input type="checkbox" name="category" value="분식"> 분식</label>
+        </div>
+        <button type="button" onclick="filterRestaurants()">검색</button>
+    </form>
+
+     <!-- 식당 목록 -->
+     <div id="restaurantList" style="margin-top:20px;">
+         <h3>식당 목록</h3>
+         <ul id="list" style="max-height:300px; overflow-y:auto; border:1px solid #ccc; padding:10px;"></ul>
+     </div>
     <script type="application/json" th:utext="${json}"></script>
 </section>
 </html>

@@ -50,7 +50,10 @@ public class NewsTrendService {
             ProcessBuilder builder = new ProcessBuilder(activationCommend);//가상환경 활성화
             Process process = builder.start();
             if(process.waitFor() == 0)/*실행성공시*/{
-                builder = new ProcessBuilder(pythonPath, properties.getTrend() + "/trend.py", fileProperties.getPath() + "/trend");
+                builder = new ProcessBuilder(pythonPath,
+                        properties.getTrend() + "/trend.py",
+                        fileProperties.getPath() + "/trend"
+                );
                 process = builder.start();
                 int statusCode = process.waitFor();
                 if (statusCode == 0){
