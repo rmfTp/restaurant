@@ -73,5 +73,5 @@ commonLib.mapLib = {
         }
 };
 window.addEventListener('DOMContentLoaded', function() {
-    //commonLib.mapLib.init();
+    commonLib.mapLib.init();
 })

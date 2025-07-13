@@ -17,7 +17,7 @@ public class RestaurantApiController {
     private final RestaurantInfoService infoService;
     private final ObjectMapper om;
 
-    // ✅ 카테고리 검색 API
+    // 카테고리 검색 API
     @GetMapping("/searchByCategories")
     public List<Restaurant> searchByCategories(@RequestParam List<String> categories) {
         System.out.println("검색 카테고리: " + categories);
@@ -26,13 +26,13 @@ public class RestaurantApiController {
                 .toList();
     }
 
-    // ✅ 최근접 검색 API
+    // 최근접 검색 API
     @GetMapping("/search")
     public List<Restaurant> search(@ModelAttribute RestaurantSearch search) {
         return infoService.getNearest(search);
     }
 
-    // ✅ 전체 데이터 학습 API
+    // 전체 데이터 학습 API
     @GetMapping("/train")
     public List<Restaurant> train() {
         return repository.findAll();

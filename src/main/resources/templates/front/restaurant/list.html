@@ -13,10 +13,9 @@
     <!-- 카테고리 필터 -->
     <form id="categoryForm" style="margin-bottom:20px;">
         <div>
-            <label><input type="checkbox" name="category" value="한식"> 한식</label>
-            <label><input type="checkbox" name="category" value="중식"> 중식</label>
-            <label><input type="checkbox" name="category" value="일식"> 일식</label>
-            <label><input type="checkbox" name="category" value="분식"> 분식</label>
+            <select name="category" id="category">
+                <option th:each="c : ${category}" th:value="${c}" th:text="${c}"></option>
+            </select>
         </div>
         <button type="button" onclick="filterRestaurants()">검색</button>
     </form>

@@ -30,6 +30,7 @@ public class RestaurantController {
         mode = StringUtils.hasText(mode) ? mode : "list";
 
         String pageTitle = "";
+        List<String> category = new ArrayList<>();
         List<String> addCss = new ArrayList<>();
         List<String> addScript = new ArrayList<>();
         List<String> addCommonScript = new ArrayList<>();
@@ -37,13 +38,14 @@ public class RestaurantController {
         if (mode.equals("list")) {
             pageTitle = utils.getMessage("오늘의_식당");
             addCss.add("restaurant/list");
-            addScript.add("restaurant/list");
             addScript.add("map");
+            addScript.add("restaurant/list");
         }
-
+        List<String> categories = List.of("한식", "경양식", "까페", "분식", "횟집", "호프/통닭", "기타", "중국식", "일식", "식육(숯불구이)", "뷔페식", "김밥(도시락)", "정종/대포집/소주방", "외국음식전문점(인도,태국등)", "냉면집", "탕류(보신용)", "패밀리레스트랑", "감성주점", "출장조리", "라이브카페", "키즈카페", "통닭(치킨)", "복어취급", "패스트푸드", "전통찻집", "이동조리", "기타 휴게음식점", "커피숍");
+        model.addAttribute("category", categories);
         model.addAttribute("pageTitle", pageTitle);
         model.addAttribute("addCss", addCss);
         model.addAttribute("addScript", addScript);
-        model.addAttribute("addCommonScript", addCommonScript); // ✅ 오타 수정
+        model.addAttribute("addCommonScript", addCommonScript);
     }
 }
