@@ -1,1 +1,27 @@
-.restaurant-
+h1,h3{margin:10px 0 10px 10px;}
+h3{margin-top:20px;}
+#categoryForm{
+    max-width:480px; min-width:350px;
+    margin:0 auto;
+}
+select{
+    width:calc(100%-12px);
+    text-align:center;
+    font-size:35px;
+    height:45px;
+    line-height:45px;
+    margin:10px 5px;
+    border: 1px solid #669bbc;
+    box-size:margin-box;
+}
+select option{font-size:0.7em;}
+.btn{
+    font-weight:Bold;
+    margin:10px 5px;
+}
+#list{
+    margin:5px;
+    border: 1px solid #669bbc;
+    font-size:25px;
+}
+#list *:hover{font-weight:bold}

@@ -26,20 +26,14 @@ window.addEventListener("DOMContentLoaded", function() {
     });
 });
 window.filterRestaurants = function () {
-    const checkboxes = document.querySelectorAll('input[name="category"]:checked');
-    const selectedCategories = Array.from(checkboxes).map((cb) => cb.value);
+    const selectedCategory = document.querySelectorAll('select[name="category"]').value;
 
-    if (selectedCategories.length === 0) {
-        alert("카테고리를 선택하세요.");
-        return;
-    }
-
-    fetch(`/restaurant/searchByCategories?categories=${selectedCategories.join(",")}`)
+    fetch(`/restaurant/searchByCategories?categories=${selectedCategory}`)
         .then((res) => res.json())
         .then((items) => {
             mapLib.load(el, items, null, '100%', '500px'); // 지도 마커 업데이트
 
-            // ✅ 목록 업데이트
+            // 목록 업데이트
             const listElement = document.getElementById("list");
             listElement.innerHTML = "";
             items.forEach((item) => {
@@ -47,7 +41,7 @@ window.filterRestaurants = function () {
                 li.textContent = `${item.name} - ${item.address}`;
                 listElement.appendChild(li);
 
-                // ✅ 목록 클릭 시 지도 이동
+                // 목록 클릭 시 지도 이동
                 li.addEventListener("click", () => {
                     const markerPosition = new kakao.maps.LatLng(item.lat, item.lon);
                     mapLib.map.setCenter(markerPosition);

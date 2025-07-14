@@ -11,13 +11,12 @@
     <h1 th:text="${pageTitle}"></h1>
     <div id="map"></div>
     <!-- 카테고리 필터 -->
+    <h3>카테고리 검색</h3>
     <form id="categoryForm" style="margin-bottom:20px;">
-        <div>
-            <select name="category" id="category">
-                <option th:each="c : ${category}" th:value="${c}" th:text="${c}"></option>
-            </select>
-        </div>
-        <button type="button" onclick="filterRestaurants()">검색</button>
+        <select name="category" id="category">
+            <option th:each="c : ${category}" th:value="${c}" th:text="${c}"></option>
+        </select>
+        <button class="btn" type="button" onclick="filterRestaurants()">검색</button>
     </form>
 
      <!-- 식당 목록 -->
