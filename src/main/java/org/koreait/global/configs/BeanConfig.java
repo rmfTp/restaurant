@@ -7,6 +7,8 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class BeanConfig {
@@ -19,11 +21,17 @@ public class BeanConfig {
         return mapper;
     }
 
-    @Bean
     @Lazy
-    public ObjectMapper objectMapper(){
+    @Bean
+    public ObjectMapper objectMapper() {
         ObjectMapper om = new ObjectMapper();
-        om.registerModule(new JavaTimeModule());
+        om.registerModule(new JavaTimeModule()); // java.time 패키지 대응
         return om;
+    }
+
+    @Lazy
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate(new HttpComponentsClientHttpRequestFactory());
     }
 }
