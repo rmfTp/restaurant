@@ -1,11 +1,11 @@
-package org.koreait.admin.product.controllers;
+package org.koreait.product.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.koreait.admin.global.controllers.CommonController;
-import org.koreait.admin.product.constants.ProductStatus;
-import org.koreait.admin.product.services.ProductUpdateService;
 import org.koreait.global.annotations.ApplyCommonController;
+import org.koreait.product.constants.ProductStatus;
+import org.koreait.product.services.ProductUpdateService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -36,7 +36,7 @@ public class ProductController extends CommonController {
     }
 
     @ModelAttribute("status")
-    public ProductStatus[] statusList(){
+    public org.koreait.product.constants.ProductStatus[] statusList(){
         return ProductStatus.values();
     };
 

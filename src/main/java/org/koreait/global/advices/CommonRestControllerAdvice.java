@@ -1,7 +1,7 @@
 package org.koreait.global.advices;
 
 import lombok.RequiredArgsConstructor;
-import org.koreait.admin.rests.JSONError;
+import org.koreait.product.rests.JSONError;
 import org.koreait.global.exceptions.CommonException;
 import org.koreait.global.libs.Utils;
 import org.springframework.http.HttpStatus;

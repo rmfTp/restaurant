@@ -1,4 +1,4 @@
-package org.koreait.admin.rests;
+package org.koreait.product.rests;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

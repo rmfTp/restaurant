@@ -4,21 +4,29 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.StringExpression;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.koreait.admin.product.controllers.RequestProduct;
 import org.koreait.file.services.FileInfoService;
 import org.koreait.global.search.ListData;
+import org.koreait.global.search.Pagination;
 import org.koreait.product.controllers.ProductSearch;
+import org.koreait.product.controllers.RequestProduct;
 import org.koreait.product.entities.Product;
 import org.koreait.product.entities.QProduct;
 import org.koreait.product.exceptions.ProductNotFoundException;
 import org.koreait.product.repositories.ProductRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
+import java.util.List;
+
+import static org.springframework.data.domain.Sort.Order.desc;
 
 @Lazy
 @Service
@@ -34,6 +42,7 @@ public class ProductInfoService {
     public Product get(Long seq) {
 
         Product item = repository.findById(seq).orElseThrow(ProductNotFoundException::new);
+        addInfo(item);
 
         return item;
     }
@@ -82,6 +91,7 @@ public class ProductInfoService {
                 fields = product.name;
             } else if (sopt.equals("DESCRIPTION")) {
                 fields = product.description;
+
             } else {
                 fields = product.name.concat(product.description);
             }
@@ -103,47 +113,24 @@ public class ProductInfoService {
                     .or(product.consumerPrice.loe(ePrice)));
         }
         /* 판매가, 소비자가 검색 처리 E */
-        return null;
-    }
+        // 상품 목록 조회
+        Pageable pageable = PageRequest.of(page - 1,limit, Sort.by(desc("createdAt")));
+        Page<Product> data = repository.findAll(andBuilder, pageable);
+        List<Product> items = data.getContent();
+        long total = data.getTotalElements();
+        items.forEach(this::addInfo); // 추가 정보 처리
 
-//        if (!arrWhere.isEmpty()) {
-//            String where = " WHERE " + arrWhere.stream().collect(Collectors.joining(" AND "));
-//            sb1.append(where);
-//            sb2.append(where);
-//        }
-//
-//        /* 페이징 처리 S */
-//
-//
-//
-//        // 전체 갯수
-//        int total = jdbcTemplate.queryForObject(sb2.toString(), int.class, params.toArray());
-//
-//        sb1.append(" ORDER BY createdAt DESC LIMIT ?, ?");
-//        params.add(offset);
-//        params.add(limit);
-//
-//        // 상품 목록 조회
-//        List<Product> items = jdbcTemplate.query(sb1.toString(), this::mapper, params.toArray());
-//        items.forEach(this::addInfo); // 추가 정보 처리
-//
-//        Pagination pagination = new Pagination(page, total, 10, limit, request);
-//        /* 페이징 처리 E */
-//
-//        return new ListData<>(items, pagination);
-//    }
-//
-//    /**
-//     * 상품 추가 정보 처리
-//     *
-//     * @param item
-//     */
-//    private void addInfo(Product item) {
-//        /* 업로드한 파일 처리 S */
-//        String gid = item.getGid();
-//        item.setMainImages(fileInfoService.getList(gid, "main"));
-//        item.setListImages(fileInfoService.getList(gid, "list"));
-//        item.setEditorImages(fileInfoService.getList(gid, "editor"));
-//        /* 업로드한 파일 처리 E */
-//    }
+        Pagination pagination = new Pagination(page, (int) total, 10, limit, request);
+        /* 페이징 처리 E */
+
+        return new ListData<>(items, pagination);
+    }
+    private void addInfo(Product item) {
+        /* 업로드한 파일 처리 S */
+        String gid = item.getGid();
+        item.setMainImages(fileInfoService.getList(gid, "main"));
+        item.setListImages(fileInfoService.getList(gid, "list"));
+        item.setEditorImages(fileInfoService.getList(gid, "editor"));
+        /* 업로드한 파일 처리 E */
+    }
 }
