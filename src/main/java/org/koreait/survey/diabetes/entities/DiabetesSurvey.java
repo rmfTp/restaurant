@@ -9,6 +9,7 @@ import org.koreait.survey.diabetes.constants.SmokingHistory;
 
 @Data
 @Entity
+@Table(name = "diabetes_survey")
 public class DiabetesSurvey extends BaseEntity {
     @Id
     @GeneratedValue

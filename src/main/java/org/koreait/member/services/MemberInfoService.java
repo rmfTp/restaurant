@@ -94,7 +94,7 @@ public class MemberInfoService implements UserDetailsService {
         }
 
         List<Authority> authorities = search.getAuthority();
-        if (!authorities.isEmpty()) {
+        if (authorities != null && !authorities.isEmpty()) {
             andBuilder.and(member.authority.in(authorities));
         }
 
