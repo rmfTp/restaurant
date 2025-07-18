@@ -1,8 +1,8 @@
 package org.koreait.member.social.test;
 
 import org.junit.jupiter.api.Test;
+import org.koreait.global.libs.Utils;
 import org.koreait.member.social.entities.AuthToken;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
@@ -14,8 +14,9 @@ import java.util.Map;
 
 @SpringBootTest
 public class AccessTokenTest {
-    @Autowired
+
     private RestTemplate restTemplate;
+    private Utils utils;
 
     @Test
     void test() {

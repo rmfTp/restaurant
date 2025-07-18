@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.koreait.global.entities.BaseEntity;
 import org.koreait.member.constants.Authority;
+import org.koreait.member.social.constants.SocialType;
 
 import java.time.LocalDateTime;
 
@@ -12,7 +13,9 @@ import java.time.LocalDateTime;
 @Table(indexes = {
         @Index(name = "idx_member_created_at", columnList = "createdAt DESC"),
         @Index(name = "idx_member_name", columnList = "name"),
-        @Index(name = "idx_member_mobile", columnList = "mobile")
+        @Index(name = "idx_member_mobile", columnList = "mobile"),
+        @Index(name = "idx_member_social", columnList = "socialType,socialToken"),
+        @Index(name = "idx_member_social_type", columnList = "socialType")
 })
 public class Member extends BaseEntity {
     @Id
@@ -28,6 +31,12 @@ public class Member extends BaseEntity {
     private String mobile;
     @Enumerated(EnumType.STRING)
     private Authority authority = Authority.MEMBER;
+
+    @Enumerated(EnumType.STRING)
+    private SocialType socialType;
+
+    @Column(length = 65)
+    private String socialToken;
 
     private boolean termsAgree;
 

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import org.koreait.member.social.constants.SocialType;
 
 @Data
 public class RequestJoin {
@@ -27,4 +28,7 @@ public class RequestJoin {
 
     @AssertTrue
     private boolean termsAgree;
+    
+    private SocialType socialType;
+    private String SocialToken;
 }

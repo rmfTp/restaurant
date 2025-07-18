@@ -4,8 +4,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.koreait.global.annotations.ApplyCommonController;
 import org.koreait.global.libs.Utils;
-import org.koreait.member.libs.MemberUtil;
 import org.koreait.member.services.JoinService;
+import org.koreait.member.social.constants.SocialType;
+import org.koreait.member.social.services.KakaoLoginService;
+import org.koreait.member.social.services.NaverLoginService;
 import org.koreait.member.validators.JoinValidator;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,7 +28,8 @@ public class MemberController {
     private final Utils utils;
     private final JoinValidator joinValidator;
     private final JoinService joinService;
-    private final MemberUtil memberUtil;
+    private final KakaoLoginService kakaoLoginService;
+    private final NaverLoginService naverLoginService;
 
     @ModelAttribute("addCss")
     public List<String> addCss() {
@@ -40,8 +43,15 @@ public class MemberController {
 
     // 회원가입 양식
     @GetMapping("/join")    
-    public String join(@ModelAttribute RequestJoin form, Model model) {
+    public String join(
+            @ModelAttribute RequestJoin form,
+            Model model,
+            @SessionAttribute(name = "socialType", required = false) SocialType type,
+            @SessionAttribute(name = "socialToken", required = false) String socialToken
+            ) {
         commonProcess("join", model);
+        form.setSocialType(type);
+        form.setSocialToken(socialToken);
 
         return utils.tpl("member/join");
     }
@@ -76,6 +86,8 @@ public class MemberController {
         });
         List<String> globalErrors = form.getGlobalErrors();
         if (globalErrors != null)globalErrors.forEach(errors::reject);
+
+        model.addAttribute("kakaoLoginUrl", kakaoLoginService.getLoginUrl(form.getRedirectUrl()));
 
         return utils.tpl("member/login");
     }
@@ -116,18 +128,4 @@ public class MemberController {
         model.addAttribute("addScript", addScript);
         model.addAttribute("pageTitle", pageTitle);
     }
-
-//    @ResponseBody
-//    @GetMapping("/test")
-//    public void test(Principal principal){
-//        String email = principal.getName();
-//        System.out.println("email:" + email);
-//    }
-
-//    @ResponseBody
-//    @GetMapping("/test")
-//    public void test(@AuthenticationPrincipal MemberInfo memberInfo){
-//        System.out.println(memberInfo);
-//    }
-
 }
