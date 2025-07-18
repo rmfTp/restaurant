@@ -1,46 +1,44 @@
 package org.koreait.survey.diabetes.services;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.koreait.global.constants.Gender;
 import org.koreait.global.exceptions.UnAuthorizedException;
 import org.koreait.global.search.CommonSearch;
 import org.koreait.global.search.ListData;
 import org.koreait.global.search.Pagination;
 import org.koreait.member.entities.Member;
 import org.koreait.member.libs.MemberUtil;
-import org.koreait.survey.diabetes.constants.SmokingHistory;
 import org.koreait.survey.diabetes.entities.DiabetesSurvey;
+import org.koreait.survey.diabetes.entities.QDiabetesSurvey;
+import org.koreait.survey.diabetes.repositories.DiabetesSurveyRepository;
 import org.koreait.survey.exceptions.SurveyNotFoundException;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 @Lazy
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class DiabetesSurveyInfoService {
-    private final JdbcTemplate jdbcTemplate;
     private final MemberUtil memberUtil;
     private final HttpServletRequest request;
+    private final DiabetesSurveyRepository repository;
+    private final JPAQueryFactory queryFactory;
 
     public DiabetesSurvey get(Long seq) {
-        try {
-            String sql = "SELECT s.*, m.email, m.name, m.mobile FROM SURVEY_DIABETES s " +
-                    " LEFT JOIN MEMBER m ON s.memberSeq = m.seq WHERE s.seq = ?";
-            DiabetesSurvey item = jdbcTemplate.queryForObject(sql, this::mapper, seq);
+        DiabetesSurvey item = repository.findById(seq).orElseThrow(SurveyNotFoundException::new);
 
-            Member member = memberUtil.getMember();
-            if (!memberUtil.isLogin() || (!memberUtil.isAdmin() && !member.getSeq().equals(item.getMemberSeq())))throw new UnAuthorizedException();
-            return item;
-        } catch (DataAccessException e) {
-            throw new SurveyNotFoundException();
-        }
+        Member member = item.getMember();
+        Member loggedMember = memberUtil.getMember();
+        if (
+            !memberUtil.isLogin() || (!memberUtil.isAdmin() && !loggedMember.getSeq().equals(member.getSeq()))
+        )throw new UnAuthorizedException();
+        return item;
     }
 
     public ListData<DiabetesSurvey> getList(CommonSearch search){
@@ -48,39 +46,24 @@ public class DiabetesSurveyInfoService {
         int page = Math.max(search.getPage(), 1);
         int limit = search.getLimit();
         int offset = (page - 1) * limit;
-        Member member = memberUtil.getMember();
-        String sql = "SELECT s.*, m.email, m.name, m.mobile FROM SURVEY_DIABETES s" +
-                "LEFT JOIN MEMBER m ON s.memberSeq = m.seq WHERE memberSeq = ?" +
-                "ORDER BY s.createdAt DESC LIMIT ?, ?";
 
-        List<DiabetesSurvey> items = jdbcTemplate.query(sql, this::mapper, member.getSeq(),offset,limit);
-        int total = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM SURVEY_DIABETES WHERE memberSeq = ?", int.class, member.getSeq());
-        Pagination pagination = new Pagination(page,total,10,limit,request);
+        Member loggedMember = memberUtil.getMember();
+        QDiabetesSurvey diabetesSurvey = QDiabetesSurvey.diabetesSurvey;
+        BooleanBuilder andBuilder = new BooleanBuilder();
+        andBuilder.and(diabetesSurvey.member.eq(loggedMember));
+
+        List<DiabetesSurvey> items = queryFactory.selectFrom(diabetesSurvey)
+                .leftJoin(diabetesSurvey.member)
+                .fetchJoin()
+                .where(andBuilder)
+                .orderBy(diabetesSurvey.createdAt.desc())
+                .offset(offset)
+                .limit(limit)
+                .fetch();
+
+        long total =repository.count(andBuilder);
+
+        Pagination pagination = new Pagination(page, (int) total, 10, limit, request);
         return new ListData<>(items,pagination);
-    }
-
-    private DiabetesSurvey mapper(ResultSet rs, int i) throws SQLException {
-        DiabetesSurvey item = new DiabetesSurvey();
-        item.setSeq(rs.getLong("seq"));
-        item.setMemberSeq(rs.getLong("memberSeq"));
-        item.setGender(Gender.valueOf(rs.getString("gender")));
-        item.setAge(rs.getInt("age"));
-        item.setDiabetes(rs.getBoolean("diabetes"));
-        item.setBmi(rs.getDouble("bmi"));
-        item.setHeight(rs.getDouble("height"));
-        item.setWeight(rs.getDouble("weight"));
-        item.setHypertension(rs.getBoolean("hypertension"));
-        item.setHeartDisease(rs.getBoolean("heartDisease"));
-        item.setHbA1c(rs.getDouble("hbA1c"));
-        item.setBloodGlucoseLevel(rs.getDouble("bloodGlucoseLevel"));
-        item.setSmokingHistory(SmokingHistory.valueOf(rs.getString("smokingHistory")));
-
-        Member member = new Member();
-        member.setSeq(rs.getLong("memberSeq"));
-        member.setName(rs.getString("name"));
-        member.setEmail(rs.getString("email"));
-        member.setMobile(rs.getString("mobile"));
-        item.setMember(member);
-        return item;
     }
 }

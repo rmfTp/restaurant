@@ -35,10 +35,11 @@ public class DiabetesSurveyService {
         item.setDiabetes(diabetes);
         item.setBmi(bmi);
         if (memberUtil.isLogin()){
-            item.setMemberSeq(memberUtil.getMember().getSeq());
+            item.setMember(member);
         }
 
-        repository.save(item);
+        repository.saveAndFlush(item);/* 그냥 save로 사용가능
+        암묵적으로 플러쉬가 되어있을 것이지만 그냥 쓰는게 실수를 줄이는 방법임 */
 
         return repository.findById(item.getSeq()).orElse(null);
     }

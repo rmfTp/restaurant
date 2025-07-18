@@ -43,7 +43,7 @@ public class TrendInfoService {
      * @return
      */
     public Trend get(String category, LocalDate date) {
-        return repository.get(category, date.atStartOfDay(), LocalDateTime.of(date, LocalTime.of(23, 59, 59))).orElse(null);
+        return repository.getLatest(category, date.atStartOfDay(), LocalDateTime.of(date, LocalTime.of(23, 59, 59))).orElse(null);
     }
 
     /**

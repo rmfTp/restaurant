@@ -2,7 +2,6 @@ package org.koreait.survey.diabetes.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.ToString;
 import org.koreait.global.constants.Gender;
 import org.koreait.global.entities.BaseEntity;
 import org.koreait.member.entities.Member;
@@ -38,7 +37,6 @@ public class DiabetesSurvey extends BaseEntity {
 
     private boolean diabetes;
 
-    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 }

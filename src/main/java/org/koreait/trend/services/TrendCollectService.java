@@ -11,7 +11,6 @@ import org.koreait.trend.entities.TrendUrl;
 import org.koreait.trend.repositories.TrendRepository;
 import org.koreait.trend.repositories.TrendUrlRepository;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.WebApplicationContext;
@@ -34,7 +33,7 @@ public class TrendCollectService {
     private final WebApplicationContext ctx;
     private final TrendRepository repository;
     private final TrendUrlRepository urlRepository;
-    private final JdbcTemplate jdbcTemplate;
+
     private final ObjectMapper om;
 
     public CollectedTrend process(String url) {
@@ -42,7 +41,9 @@ public class TrendCollectService {
         // 최초 유입된 url 이라면 저장 처리(news.naver.com은 제외)
         // 등록된 URL은 주기적으로 조회하게 됨
         if (!url.contains("news.naver.com") && !urlRepository.existsById(url)) {
-            jdbcTemplate.update("INSERT INTO TREND_URL VALUES(?)", url);
+            TrendUrl trendUrl = new TrendUrl();
+            trendUrl.setSiteUrl(url);
+            urlRepository.save(trendUrl);
         }
 
         boolean isProduction = Arrays.stream(ctx.getEnvironment().getActiveProfiles()).anyMatch(s -> s.equals("prod") || s.equals("mac"));
