@@ -14,6 +14,9 @@ ENV PYTHON_TREND=/python_project/source
 ENV PYTHON_BASE2=/python_project/.venv/bin
 ENV PYTHON_RESTAURANT=/python_project/source
 
-ENTRYPOINT ["java", "-Ddb.password=${DB_PASSWORD}","-Ddb.url=${DB_URL}", "-Ddb.username=${DB_USERNAME}", "-Dfile.path=/uploads", "-Dfile.url=/uploads", "-Dpython.base=${PYTHON_BASE}", "-Dpython.trend=${PYTHON_TREND}", "-Dpython.base2=${PYTHON_BASE2}", "-Dpython.restaurant=${PYTHON_RESTAURANT}", "-Dspring.profiles.active=${SPRING_PROFILES_ACTIVE}", "-jar", "app.jar"]
+ENV ddl.auto=create
+ENV kakao.apikey=554171db1e052c89471da8f35fb9e6ac
+
+ENTRYPOINT ["java", "-Ddb.password=${DB_PASSWORD}","-Ddb.url=${DB_URL}", "-Ddb.username=${DB_USERNAME}", "-Dfile.path=/uploads", "-Dfile.url=/uploads", "-Dpython.base=${PYTHON_BASE}", "-Dpython.trend=${PYTHON_TREND}", "-Dpython.base2=${PYTHON_BASE2}", "-Dpython.restaurant=${PYTHON_RESTAURANT}", "-Dspring.profiles.active=${SPRING_PROFILES_ACTIVE}", "-Dkakao.apikey=554171db1e052c89471da8f35fb9e6ac", "-Dspring.jpa.hibernate.ddl-auto=create", "-jar", "app.jar"]
 
 EXPOSE ${PORT}
