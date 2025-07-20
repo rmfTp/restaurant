@@ -13,7 +13,7 @@
             <div th:if="*{social}">
                 <th:block th:text="*{#messages.msg('SocialType.' + socialType)}"></th:block> 회원가입
             </div>
-            <ul>
+            <ul class="joinList">
                 <li>
                    <input type="text" name="email" th:field="*{email}" th:placeholder="#{이메일}">
                    <div class="error" th:each="err : ${#fields.errors('email')}" th:text="${err}"></div>
@@ -36,13 +36,18 @@
                 </li>
             </ul>
 
-            <h3 th:text="#{약관동의}"></h3>
-            <div class="terms">약관...</div>
-            <input type="checkbox" name="termsAgree" th:field="*{termsAgree}" id="terms-agree">
-            <label for="terms-agree" th:text="#{회원가입_약관에_동의합니다}"></label>
-            <div class="error" th:each="err : ${#fields.errors('termsAgree')}" th:text="${err}"></div>
-
-           <button type="submit" th:text="#{가입하기}"></button>
+            <h3 class="term" th:text="#{약관동의}"></h3>
+            <div class="termBox">
+                <div class="terms">약관...</div>
+                <div class="agreement">
+                    <input type="checkbox" name="termsAgree" th:field="*{termsAgree}" id="terms-agree">
+                    <label for="terms-agree" th:text="#{회원가입_약관에_동의합니다}"></label>
+                    <div class="error" th:each="err : ${#fields.errors('termsAgree')}" th:text="${err}"></div>
+                </div>
+            </div>
+            <button class="kakaoTheme" th:if="${requestJoin.socialType == T(org.koreait.member.social.constants.SocialType).KAKAO}" type="submit" th:text="#{가입하기}"></button>
+            <button class="naverTheme" th:if="${requestJoin.socialType == T(org.koreait.member.social.constants.SocialType).NAVER}" type="submit" th:text="#{가입하기}"></button>
+            <button th:if="*{!social}" type="submit" th:text="#{가입하기}"></button>
         </form>
     </main>
 </html>

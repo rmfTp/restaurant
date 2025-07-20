@@ -9,7 +9,6 @@ import org.koreait.member.repositories.MemberRepository;
 import org.koreait.member.services.MemberInfoService;
 import org.koreait.member.social.constants.SocialType;
 import org.koreait.member.social.entities.AuthToken;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.*;
@@ -31,12 +30,10 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class KakaoLoginService implements SocialLoginService{
     private final Utils utils;
-    @Autowired
-    private RestTemplate restTemplate;
-    @Autowired
-    private MemberRepository memberRepository;
-    private MemberInfoService infoService;
-    private HttpSession session;
+    private final RestTemplate restTemplate;
+    private final MemberRepository memberRepository;
+    private final MemberInfoService infoService;
+    private final HttpSession session;
 
     @Value("${kakao.apikey}")
     private String apikey;
