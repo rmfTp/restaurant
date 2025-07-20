@@ -307,9 +307,9 @@ input[type='radio']:checked + label {
 /* 라디오 버튼 공통 E */
 
 /* 체크박스 공통 S */
-input[type='checkbox'] {
-    display: none;
-}
+//input[type='checkbox'] {
+//    display: none;
+//}
 
 input[type='checkbox'] + label,
 .checkbox input[type='checkbox'] ~ label {

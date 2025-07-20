@@ -8,6 +8,7 @@ import org.koreait.member.repositories.MemberRepository;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
+import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 @Lazy
@@ -36,25 +37,28 @@ public class JoinValidator implements Validator, PasswordValidator, MobileValida
          * 4. 휴대폰번호 형식 검증
          */
         RequestJoin form = (RequestJoin) target;
-        String password = form.getPassword();
-        String confirmPassword = form.getConfirmPassword();
+
+        if (!form.isSocial()) {
+            ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "NotBlank");
+            ValidationUtils.rejectIfEmptyOrWhitespace(errors, "confirmPassword", "NotBlank");
+            String password = form.getPassword();
+            String confirmPassword = form.getConfirmPassword();
+            // 1. 이메일 중복 여부
+            if (repository.existsByEmail(form.getEmail())) {
+                errors.rejectValue("email", "Duplicated");
+            }
+
+            // 2. 비밀번호 복잡성
+            if (!checkAlpha(password, false) || !checkNumber(password) || !checkSpecialChars(password)) {
+                errors.rejectValue("password", "Complexity");
+            }
+
+            // 3. 비밀번호 확인
+            if (!password.equals(confirmPassword)) {
+                errors.rejectValue("confirmPassword", "Mismatch");
+            }
+        }
         String mobile = form.getMobile();
-
-        // 1. 이메일 중복 여부
-        if (repository.existsByEmail(form.getEmail())) {
-            errors.rejectValue("email", "Duplicated");
-        }
-
-        // 2. 비밀번호 복잡성
-        if (!checkAlpha(password, false) || !checkNumber(password) || !checkSpecialChars(password)) {
-            errors.rejectValue("password", "Complexity");
-        }
-
-        // 3. 비밀번호 확인
-        if (!password.equals(confirmPassword)) {
-            errors.rejectValue("confirmPassword", "Mismatch");
-        }
-
         // 4. 휴대폰번호 형식 검증
         if (!checkMobile(mobile)) {
             errors.rejectValue("mobile", "Format");

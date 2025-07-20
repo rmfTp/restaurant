@@ -27,7 +27,7 @@ public class AccessTokenTest {
         body.add("grant_type", "authorization_code");
         body.add("client_id", "554171db1e052c89471da8f35fb9e6ac");
         body.add("redirect_uri", "http://localhost:3000/member/social/callback/kakao");
-        body.add("code", "QT090_D-Sl6cXOmwhIUmUY5Cx4ZpY61HB6lP8DE6zw_eCxYVnpw3YQAAAAQKDSCbAAABmButIFP7Ewsnpgvovw ");
+        body.add("code", "GhN26ZZc0vZ_ZRbWZM-e82TefniuqNjVYV9z0vEfelrj3dwI7ZzFdwAAAAQKFwtrAAABmCcCebui-KZYUq23DA");
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body,headers);
 
         String requestUrl = "https://kauth.kakao.com/oauth/token";

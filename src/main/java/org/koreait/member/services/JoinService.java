@@ -33,7 +33,8 @@ public class JoinService {
          * 3. DB에 영구 저장
          */
 
-        String hash = encoder.encode(form.getPassword());
+        String password = form.getPassword();
+        String hash = StringUtils.hasText(password) ? encoder.encode(password) : null;
         String mobile = form.getMobile();
         if (StringUtils.hasText(mobile)) {
             mobile = mobile.replaceAll("\\D", "");

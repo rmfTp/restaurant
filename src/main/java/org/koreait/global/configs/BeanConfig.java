@@ -34,7 +34,6 @@ public class BeanConfig {
         return om;
     }
 
-    @Lazy
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate(new HttpComponentsClientHttpRequestFactory());

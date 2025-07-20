@@ -9,6 +9,7 @@ import org.koreait.member.repositories.MemberRepository;
 import org.koreait.member.services.MemberInfoService;
 import org.koreait.member.social.constants.SocialType;
 import org.koreait.member.social.entities.AuthToken;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.*;
@@ -30,7 +31,9 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class KakaoLoginService implements SocialLoginService{
     private final Utils utils;
+    @Autowired
     private RestTemplate restTemplate;
+    @Autowired
     private MemberRepository memberRepository;
     private MemberInfoService infoService;
     private HttpSession session;
@@ -46,10 +49,10 @@ public class KakaoLoginService implements SocialLoginService{
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", apikey);
-        body.add("redirect_uri", utils.getUrl("/member.social/callback/kakao"));
+        body.add("redirect_uri", utils.getUrl("/member/social/callback/kakao"));
         body.add("code", code);
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body,headers);
-
+        System.out.println("카카오 API키: " + apikey);
         String requestUrl = "https://kauth.kakao.com/oauth/token";
 
         ResponseEntity<AuthToken> response = restTemplate.exchange(URI.create(requestUrl), HttpMethod.POST, request, AuthToken.class);

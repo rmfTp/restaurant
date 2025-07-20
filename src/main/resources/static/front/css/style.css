@@ -245,7 +245,7 @@ textarea {
 
 .button-group .btn {
     flex-grow: 1;
-    width: 0;
+    width: 10px;
 }
 
 .button-group .btn + .btn {
