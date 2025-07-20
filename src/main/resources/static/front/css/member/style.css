@@ -1,7 +1,6 @@
 button{
     width:300px; height:45px;
     margin:10px;
-    margin-left:calc(100% - 280px);
 }
 #terms-agree, #auto-login{
     display:inline-block;
@@ -12,6 +11,11 @@ button{
     max-width:450px;
     min-width:380px;
     width:100%;
+}
+.themeButton>button{
+    margin-left:calc(100% - 310px);
+    border:0;
+    border-radius:3px;
 }
 .joinList li, .loginList li{
     margin-bottom:10px;

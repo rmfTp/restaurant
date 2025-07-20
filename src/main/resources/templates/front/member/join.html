@@ -45,9 +45,11 @@
                     <div class="error" th:each="err : ${#fields.errors('termsAgree')}" th:text="${err}"></div>
                 </div>
             </div>
-            <button class="kakaoTheme" th:if="${requestJoin.socialType == T(org.koreait.member.social.constants.SocialType).KAKAO}" type="submit" th:text="#{가입하기}"></button>
-            <button class="naverTheme" th:if="${requestJoin.socialType == T(org.koreait.member.social.constants.SocialType).NAVER}" type="submit" th:text="#{가입하기}"></button>
-            <button th:if="*{!social}" type="submit" th:text="#{가입하기}"></button>
+            <div class="themeButton">
+                <button class="kakaoTheme" th:if="${requestJoin.socialType == T(org.koreait.member.social.constants.SocialType).KAKAO}" type="submit" th:text="#{가입하기}"></button>
+                <button class="naverTheme" th:if="${requestJoin.socialType == T(org.koreait.member.social.constants.SocialType).NAVER}" type="submit" th:text="#{가입하기}"></button>
+                <button th:if="*{!social}" type="submit" th:text="#{가입하기}"></button>
+            </div>
         </form>
     </main>
 </html>
