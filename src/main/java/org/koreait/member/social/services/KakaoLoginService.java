@@ -30,10 +30,10 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class KakaoLoginService implements SocialLoginService{
     private final Utils utils;
-    private RestTemplate restTemplate;
-    private MemberRepository memberRepository;
-    private MemberInfoService infoService;
-    private HttpSession session;
+    private final RestTemplate restTemplate;
+    private final MemberRepository memberRepository;
+    private final MemberInfoService infoService;
+    private final HttpSession session;
 
     @Value("${kakao.apikey}")
     private String apikey;
@@ -46,7 +46,7 @@ public class KakaoLoginService implements SocialLoginService{
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", apikey);
-        body.add("redirect_uri", utils.getUrl("/member.social/callback/kakao"));
+        body.add("redirect_uri", utils.getUrl("/member/social/callback/kakao"));
         body.add("code", code);
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body,headers);
 
